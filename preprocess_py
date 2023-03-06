@@ -1,0 +1,31 @@
+import os
+import cv2
+
+def preprocess_fundus_images(input_folder, output_folder):
+    # Create the output folder if it doesn't exist
+    if not os.path.exists(output_folder):
+        os.makedirs(output_folder)
+
+    # Loop through each image file in the input folder
+    for filename in os.listdir(input_folder):
+        if filename.endswith(".jpg") or filename.endswith(".png"):
+            # Read the image
+            image = cv2.imread(os.path.join(input_folder, filename))
+
+            # Resize the image to a fixed size
+            image = cv2.resize(image, (512, 512))
+
+            # Convert the image to grayscale
+            gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+
+            # Apply CLAHE to enhance contrast
+            clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8,8))
+            gray = clahe.apply(gray)
+
+            # Write the preprocessed image to the output folder
+            cv2.imwrite(os.path.join(output_folder, filename), gray)
+
+    print("Preprocessing complete.")
+
+# Example usage:
+preprocess_fundus_images("input_folder", "output_folder")
